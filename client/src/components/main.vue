@@ -18,33 +18,33 @@
         Create New task
       </div>
       <div class="content">
-        <form class="ui form">
+        <form class="ui form" v-on:submit.prevent="addTask">
           <div class="field">
             <div class="fields">
               <div class="eight wide field">
                 <label>Title</label>
-                <input type="text" name="title" placeholder="input task">
+                <input type="text" name="title" placeholder="input task title" v-model="newTask.title">
               </div>
               <div class="eight wide field">
                 <label>Assign To</label>
-                <input type="text" name="assignTo" value="" placeholder="assign into..">
+                <input type="text" name="asignTo" value="" placeholder="asign into.." v-model="newTask.asignTo">
               </div>
             </div>
           </div>
           <div class="field">
             <label>Description</label>
-            <textarea name="Description"></textarea>
+            <textarea name="Description" placeholder="input decription of task" v-model="newTask.description"></textarea>
           </div>
           <div class="two fields">
             <div class="nine wide field">
               <label>Point</label>
-              <input type="text" name="point" placeholder="input your task point">
+              <input type="text" name="point" placeholder="input your task point" v-model="newTask.point">
             </div>
             <div class="seven wide field">
               <label>Status</label>
-              <select class="ui fluid dropdown" name="" v-on:click="setDropDown">
-                <option value="backlog">Back-Log</option>
-                <option value="todo">To-Do</option>
+              <select class="ui fluid dropdown" name="status" v-on:click="setDropDown" v-model="newTask.status">
+                <option value="back-log">Back-Log</option>
+                <option value="to-do">To-Do</option>
                 <option value="doing">Doing</option>
                 <option value="done">Done</option>
               </select>
@@ -54,73 +54,295 @@
             <div class="ui black deny button">
               Cancel
             </div>
-            <button type="button" name="prev" class="ui labeled icon button" v-on:click="asyncSave"><i class="save icon"></i>Save</button>
+            <button type="submit" name="prev" class="ui labeled icon button"><i class="save icon"></i>Save</button>
           </div>
         </form>
       </div>
     </div>
     <div class="maincontainer" style="padding-top: 10px; padding-left: 15px; padding-right: 15px;">
-      <div class="ui fluid container">
+      <div class="ui container">
         <h3 class="ui horizontal divider header">
-          <i class="checkmark box icon"></i>
+          <i class="check circle icon"></i>
           DONE
         </h3>
       </div>
-      <div class="ui fluid container">
-        <div class="ui card" v-for="">
-          <div class="content">
-            <div class="header">Project Title</div>
-          </div>
-          <div class="content">
-            <h4 class="ui sub header">Activity</h4>
-            <div class="ui small feed">
-              <div class="event">
-                <div class="content">
-                  <div class="summary">
-                     <a>Sign To :</a> name of assignTo
+      <div class="ui container" style="padding-top:20px;">
+        <div class="ui link cards">
+          <div class="card" v-for="task in tasks" v-if="task.status == 'done'">
+            <div class="content">
+              <div class="header">{{ task.title }}</div>
+            </div>
+            <div class="content">
+              <h4 class="ui sub header">Activity</h4>
+              <div class="ui small feed">
+                <div class="event">
+                  <div class="content">
+                    <div class="summary">
+                       <a>Sign To :</a> {{ task.asignTo }}
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class="event">
-                <div class="content">
-                  <div class="summary">
-                     <a>Description :</a> text of description
+                <div class="event">
+                  <div class="content">
+                    <div class="summary">
+                       <a>Description :</a> {{ task.description }}
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class="event">
-                <div class="content">
-                  <div class="summary">
-                     <a>Point :</a> added point for yout task
+                <div class="event">
+                  <div class="content">
+                    <div class="summary">
+                       <a>Point :</a> {{ task.point }}
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class="event">
-                <div class="content">
-                  <div class="summary">
-                     <a>status :</a> added point for yout task
+                <div class="event">
+                  <div class="content">
+                    <div class="summary">
+                       <a>status :</a> {{ task.status }}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+            <div class="extra content">
+              <button class="ui animated button" v-on:click="deleteTask(task)">
+                <div class="visible content">
+                  Delete
+                </div>
+                <div class="hidden content">
+                  <i class="trash outline icon"></i>
+                </div>
+              </button>
+              <button class="ui animated button" v-on:click="updateTask(task, 'doing')">
+                <div class="visible content">
+                  Doing
+                </div>
+                <div class="hidden content">
+                  <i class="arrow down icon"></i>
+                </div>
+              </button>
+            </div>
           </div>
-          <div class="extra content">
-            <button class="ui animated button">
-              <div class="visible content">
-                Delete
+        </div>
+      </div>
+    </div>
+    <div class="maincontainer" style="padding-top: 10px; padding-left: 15px; padding-right: 15px;">
+      <div class="ui container">
+        <h3 class="ui horizontal divider header">
+          <i class="street view icon"></i>
+          DOING
+        </h3>
+      </div>
+      <div class="ui container" style="padding-top:20px;">
+        <div class="ui link cards">
+          <div class="card" v-for="task in tasks" v-if="task.status == 'doing'">
+            <div class="content">
+              <div class="header">{{ task.title }}</div>
+            </div>
+            <div class="content">
+              <h4 class="ui sub header">Activity</h4>
+              <div class="ui small feed">
+                <div class="event">
+                  <div class="content">
+                    <div class="summary">
+                       <a>Sign To :</a> {{ task.asignTo }}
+                    </div>
+                  </div>
+                </div>
+                <div class="event">
+                  <div class="content">
+                    <div class="summary">
+                       <a>Description :</a> {{ task.description }}
+                    </div>
+                  </div>
+                </div>
+                <div class="event">
+                  <div class="content">
+                    <div class="summary">
+                       <a>Point :</a> {{ task.point }}
+                    </div>
+                  </div>
+                </div>
+                <div class="event">
+                  <div class="content">
+                    <div class="summary">
+                       <a>status :</a> {{ task.status }}
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="hidden content">
-                <i class="trash outline icon"></i>
+            </div>
+            <div class="extra content">
+              <button class="ui animated button" v-on:click="deleteTask(task)">
+                <div class="visible content">
+                  Delete
+                </div>
+                <div class="hidden content">
+                  <i class="trash outline icon"></i>
+                </div>
+              </button>
+              <button class="ui animated button" v-on:click="updateTask(task, 'to-do')">
+                <div class="visible content">
+                  To-do
+                </div>
+                <div class="hidden content">
+                  <i class="arrow down icon"></i>
+                </div>
+              </button>
+              <button class="ui animated button" v-on:click="updateTask(task, 'done')">
+                <div class="visible content">
+                  Done
+                </div>
+                <div class="hidden content">
+                  <i class="arrow up icon"></i>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="maincontainer" style="padding-top: 10px; padding-left: 15px; padding-right: 15px;">
+      <div class="ui container">
+        <h3 class="ui horizontal divider header">
+          <i class="book icon"></i>
+          TO-DO
+        </h3>
+      </div>
+      <div class="ui container" style="padding-top:20px;">
+        <div class="ui link cards">
+          <div class="card" v-for="task in tasks" v-if="task.status == 'to-do'">
+            <div class="content">
+              <div class="header">{{ task.title }}</div>
+            </div>
+            <div class="content">
+              <h4 class="ui sub header">Activity</h4>
+              <div class="ui small feed">
+                <div class="event">
+                  <div class="content">
+                    <div class="summary">
+                       <a>Sign To :</a> {{ task.asignTo }}
+                    </div>
+                  </div>
+                </div>
+                <div class="event">
+                  <div class="content">
+                    <div class="summary">
+                       <a>Description :</a> {{ task.description }}
+                    </div>
+                  </div>
+                </div>
+                <div class="event">
+                  <div class="content">
+                    <div class="summary">
+                       <a>Point :</a> {{ task.point }}
+                    </div>
+                  </div>
+                </div>
+                <div class="event">
+                  <div class="content">
+                    <div class="summary">
+                       <a>status :</a> {{ task.status }}
+                    </div>
+                  </div>
+                </div>
               </div>
-            </button>
-            <button class="ui animated button">
-              <div class="visible content">
-                Doing
+            </div>
+            <div class="extra content">
+              <button class="ui animated button" v-on:click="deleteTask(task)">
+                <div class="visible content">
+                  Delete
+                </div>
+                <div class="hidden content">
+                  <i class="trash outline icon"></i>
+                </div>
+              </button>
+              <button class="ui animated button" v-on:click="updateTask(task, 'back-log')">
+                <div class="visible content">
+                  Back
+                </div>
+                <div class="hidden content">
+                  <i class="arrow down icon"></i>
+                </div>
+              </button>
+              <button class="ui animated button" v-on:click="updateTask(task, 'doing')">
+                <div class="visible content">
+                  Doing
+                </div>
+                <div class="hidden content">
+                  <i class="arrow up icon"></i>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="maincontainer" style="padding-top: 10px; padding-left: 15px; padding-right: 15px;">
+      <div class="ui container">
+        <h3 class="ui horizontal divider header">
+          <i class="bookmark icon"></i>
+          BACK-LOG
+        </h3>
+      </div>
+      <div class="ui container" style="padding-top:20px;">
+        <div class="ui link cards">
+          <div class="card" v-for="task in tasks" v-if="task.status == 'back-log'">
+            <div class="content">
+              <div class="header">{{ task.title }}</div>
+            </div>
+            <div class="content">
+              <h4 class="ui sub header">Activity</h4>
+              <div class="ui small feed">
+                <div class="event">
+                  <div class="content">
+                    <div class="summary">
+                       <a>Sign To :</a> {{ task.asignTo }}
+                    </div>
+                  </div>
+                </div>
+                <div class="event">
+                  <div class="content">
+                    <div class="summary">
+                       <a>Description :</a> {{ task.description }}
+                    </div>
+                  </div>
+                </div>
+                <div class="event">
+                  <div class="content">
+                    <div class="summary">
+                       <a>Point :</a> {{ task.point }}
+                    </div>
+                  </div>
+                </div>
+                <div class="event">
+                  <div class="content">
+                    <div class="summary">
+                       <a>status :</a> {{ task.status }}
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="hidden content">
-                <i class="arrow down icon"></i>
-              </div>
-            </button>
+            </div>
+            <div class="extra content">
+              <button class="ui animated button" v-on:click="deleteTask(task)">
+                <div class="visible content">
+                  Delete
+                </div>
+                <div class="hidden content">
+                  <i class="trash outline icon"></i>
+                </div>
+              </button>
+              <button class="ui animated button" v-on:click="updateTask(task, 'to-do')">
+                <div class="visible content">
+                  To-do
+                </div>
+                <div class="hidden content">
+                  <i class="arrow up icon"></i>
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -141,40 +363,23 @@
   //firebase.initializeApp(config);
   const firebaseApp = firebase.initializeApp(config);
   const db = firebaseApp.database()
-  const taskRef = db.ref('task')
+  const taskRef = db.ref('tasks')
   export default {
     data(){
       return{
-        showNewDialogTask: false,
-        title: '',
-        description: '',
-        point: 0,
-        assignTo: '',
-        status: 0,
-        loding: true,
-        task: {
-          taskId : null,
-  				title : null,
-  				description :null,
-  				point : null,
-  				assignedTo : null,
-  				status: null
-        },
-        taskNext: '',
-        taskPrev: '',
-        showModalSticky: false
+        newTask: {
+          title: '',
+          asignTo: '',
+          description: '',
+          point: 0,
+          status: '' || 'back-log'
+        }
       }
     },
       firebase: {
         tasks: taskRef
       },
       methods: {
-        showModal(task){
-          this.task = task,
-          showModalSticky = true,
-          this.next(),
-          this.prev()
-        },
         openModal(){
           $('.ui.modal')
             .modal('setting', 'transition', 'vertical flip')
@@ -184,88 +389,38 @@
           $('select.dropdown')
             .dropdown();
         },
-        next(){
-          var self = this
-    			switch(self.task.status){
-    				case 0:
-    				self.textNext = 'To Do'
-    				break;
-    				case 1:
-    				self.textNext = 'Doing'
-    				break;
-    				case 2:
-    				self.textNext = 'Done'
-    				break;
-    				case 3:
-    				self.textNext = 'Done'
-    				break;
-    			}
-        },
-        prev(){
-    			var self = this
-    			switch(self.task.status){
-    				case 0:
-    				self.textPrev = 'Back Log'
-    				break;
-    				case 1:
-    				self.textPrev = 'Back Log'
-    				break;
-    				case 2:
-    				self.textPrev = 'To Do'
-    				break;
-    				case 3:
-    				self.textPrev = 'Doing'
-    				break;
-    			}
-    		},
-    		updateNext(task, newStatus){
-    			tasksRef.child(task['.key'])
-    			.child('status')
-    			.set(newStatus)
-    			this.showModalSticky = false
-    		},
-    		updatePrev(task, newStatus){
-    			tasksRef.child(task['.key'])
-    			.child('status')
-    			.set(newStatus)
-    			this.showModalSticky = false
-    		},
     		deleteTask(task){
-    			this.$firebaseRefs.tasks.child(task['.key']).remove()
-    			this.showModalSticky = false
+    	     taskRef.child(task['.key']).remove();
     		},
-    		asyncSave(){
-    			var self = this
-    			let str = '0123456789';
-    			let length = 3;
-    			let result = '';
-    			for (let i = length; i > 0; i--) {
-    				result += str[Math.floor(Math.random() * str.length)];
-    			}
-    			var data = {
-    				taskId : result,
-    				title: self.title,
-    				description: self.description,
-    				point: self.point,
-    				assignedTo : self.assignedTo,
-    				status : self.status
-    			}
-    			tasksRef.push(data)
-    			setTimeout(() => {
-    				self.loading = false;
-    				self.showModalNewTask = false
-    				self.title = ''
-    				self.description =''
-    				self.point = 0
-    				self.assignedTo = ''
-    			}, 2000);
-    		},
+        updateTask(task, status){
+          //let this = self;
+          let statusBaru = status
+          console.log(task);
+          let newTask = {
+            title : task.title,
+            asignTo : task.asignTo,
+            description : task.description,
+            point : task.point,
+            status : statusBaru
+          }
+          taskRef.child(task['.key']).remove()
+          taskRef.child(task['.key']).set(newTask)
+        },
+    		addTask(){
+          taskRef.push(this.newTask);
+          this.newTask.title = '';
+          this.newTask.asignTo = '';
+          this.newTask.point = 0;
+          this.newTask.description = '';
+          this.newTask.status = '';
+          alert('Add Task Success');
+        },
+
     		asyncCancel(){
-    			this.showModal = false
     			this.title = ''
     			this.description =''
     			this.point = 0
-    			this.assignedTo = ''
+    			this.assignTo = ''
     		}
     	}
     }
